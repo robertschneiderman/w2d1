@@ -4,9 +4,10 @@ require_relative "cursorable"
 class Display
   include Cursorable
 
-  def initialize(board)
+  def initialize(board, debug = false)
     @board = board
-    @cursor_pos = [0, 0]
+    @cursor_pos = [0, 2]
+    @debug = debug
   end
 
   def build_grid
@@ -38,5 +39,12 @@ class Display
     puts "Fill the grid!"
     puts "Arrow keys, WASD, or vim to move, space or enter to confirm."
     build_grid.each { |row| puts row.join }
+    if @debug
+      selected_piece = @board[@cursor_pos]
+      puts "Available moves for current piece:"
+      puts "#{selected_piece.moves}"
+      puts "White king in check" if @board.in_check?('white')
+      puts "Black king in check" if @board.in_check?('black')
+    end
   end
 end

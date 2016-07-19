@@ -3,31 +3,34 @@ require_relative 'display'
 
 class Board
 
-  attr_reader :grid
+  attr_accessor :grid
 
-  def initialize
-    @grid = Array.new(8) { Array.new(8) { NullPiece.instance } }
-    p @grid
-    populate_board
+  def initialize(grid = nil)
+    @grid = grid
+    grid ||= populate_board
   end
 
   def populate_board
+    @grid = Array.new(8) { Array.new(8) { NullPiece.instance } }
+
     pieces = [Rook, Knight, Bishop]
     pieces = pieces + [King, Queen] + pieces.reverse
 
     # top row
     [0].product((0..7).to_a).each_with_index do |pos, i|
-      self[pos]=pieces[i].new(pos, 'black', @board)
+      self[pos]=pieces[i].new(pos, 'black', self)
     end
     [1].product((0..7).to_a).each do |pos|
-      self[pos]=Pawn.new(pos, 'black', @board)
+      self[pos]=Pawn.new(pos, 'black', self)
+      # remember to add pawn back
+      # [1].product((0..7).to_a).each do |pos|
     end
     # bottom row
     [6].product((0..7).to_a).each do |pos|
-      self[pos]=Pawn.new(pos, 'white', @board)
+      self[pos]=Pawn.new(pos, 'white', self)
     end
     [7].product((0..7).to_a).each_with_index do |pos, i|
-      self[pos]=pieces.reverse[i].new(pos, 'white', @board)
+      self[pos]=pieces.reverse[i].new(pos, 'white', self)
     end
 
   end
@@ -56,7 +59,7 @@ class Board
   end
 
   def get_king(color)
-    @grid.flatten.select { |piece| piece.symbol == :K && piece.color == color }
+    @grid.flatten.find { |piece| piece.symbol == :K && piece.color == color }
   end
 
   def get_opposing_pieces(color)
@@ -67,7 +70,7 @@ class Board
   def get_all_opposing_moves(color)
     opposing_pieces = get_opposing_pieces(color)
     moves = []
-    opposite_pieces.each do |piece|
+    opposing_pieces.each do |piece|
       moves += piece.moves
     end
     moves
@@ -82,32 +85,60 @@ class Board
   end
 
   def move(start, end_pos)
+    piece = self[start]
+
     begin
-      # get_move
-      raise "Not valid move" unless valid_move(start, end_pos)
+      raise "Not valid move" unless piece.valid_move(end_pos)
     rescue
-      piece = self[start]
+
       self[end_pos] = piece
       self[start] = NullPiece.instance
       piece.position = end_pos
     end
   end
 
+  def move!(start, end_pos)
+      piece = self[start]
+      self[end_pos] = piece
+      self[start] = NullPiece.instance
+      piece.position = end_pos
+  end
   # def valid_move?(start, end_pos)
   #   start.nil?
   #   # need more criteria
   # end
-  def dup_board(board)
-      result=[]
-      @board.map{|el| el.dup}
+  def dup_board
+    duped_grid = Board.deep_dup(@grid)
+    duped_board=Board.new(duped_grid)
+  end
+
+  def self.deep_dup(grid)
+    duped_array = []
+
+    grid.each do |item|
+      if item.is_a?(Array)
+        duped_array << deep_dup(item)
+      elsif item.is_a?(NullPiece)
+        duped_array << item
+      else
+        duped_array << item.dup
+      end
+    end
+
+    duped_array
   end
 
   def in_bounds?(pos)
-    pos.all? { |coord| coord.between(0, 7) }
+    pos.all? { |coord| coord.between?(0, 7) }
   end
 
 end
 
+# arr1 = [1, 2, [3, 4]]
+#
+# arr2 = arr1.deep_dup
+#
+# p arr1[2].object_id == arr2[2].object_id
+
 b = Board.new
-# p b.grid
-Display.new(b).render
+Display.new(b, true).render
