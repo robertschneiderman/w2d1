@@ -33,8 +33,7 @@ module Slideable
     moves=[]
     diffs.each do |diff|
       pos = @position
-
-      while @board[pos] == self || @board[pos].is_a?(NullPiece)
+      while @board[pos].is_a?(NullPiece) || @board[pos] == self
         x ,y = pos
         x_diff, y_diff = diff
         pos=[x+x_diff, y+y_diff]
@@ -52,8 +51,8 @@ end
 
 class Piece
 
-  attr_accessor :position
-  attr_reader :color, :symbol, :board
+  attr_accessor :position, :board
+  attr_reader :color, :symbol
 
   def initialize(pos, color, board)
     @position = pos
@@ -72,7 +71,7 @@ class Piece
   def move_into_check?(end_pos)
     possible_board = @board.dup_board
     possible_board.move!( @position, end_pos)
-    possible_board.in_check?
+    possible_board.in_check?(@color)
   end
 
 end
@@ -106,6 +105,7 @@ class Pawn < Piece
   def initialize(pos, color, board)
     super
     @symbol = :p
+
   end
 end
 

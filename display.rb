@@ -3,10 +3,10 @@ require_relative "cursorable"
 
 class Display
   include Cursorable
-
+  attr_reader :cursor_pos
   def initialize(board, debug = false)
     @board = board
-    @cursor_pos = [0, 2]
+    @cursor_pos = [0, 0]
     @debug = debug
   end
 
@@ -17,13 +17,16 @@ class Display
   end
 
   def build_row(row, i)
+    # team_white = @board.flatten.select { |piece| piece.color == 'white' }
+
     row.map.with_index do |piece, j|
-      color_options = colors_for(i, j)
+      color = (piece.color == 'white') ? :white : :light_green
+      color_options = colors_for(i, j, color)
       piece.to_s.colorize(color_options)
     end
   end
 
-  def colors_for(i, j)
+  def colors_for(i, j, color)
     if [i, j] == @cursor_pos
       bg = :light_red
     elsif (i + j).odd?
@@ -31,7 +34,7 @@ class Display
     else
       bg = :blue
     end
-    { background: bg, color: :white }
+    { background: bg, color: color }
   end
 
   def render

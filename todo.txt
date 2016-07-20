@@ -1,0 +1,7 @@
+todo
+
+If in check? Must move out of check
+Fix checkmate
+Display current player
+Can't attack all pieces
+Pawns

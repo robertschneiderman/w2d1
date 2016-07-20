@@ -20,10 +20,9 @@ class Board
     [0].product((0..7).to_a).each_with_index do |pos, i|
       self[pos]=pieces[i].new(pos, 'black', self)
     end
+
     [1].product((0..7).to_a).each do |pos|
       self[pos]=Pawn.new(pos, 'black', self)
-      # remember to add pawn back
-      # [1].product((0..7).to_a).each do |pos|
     end
     # bottom row
     [6].product((0..7).to_a).each do |pos|
@@ -86,22 +85,23 @@ class Board
 
   def move(start, end_pos)
     piece = self[start]
-
-    begin
-      raise "Not valid move" unless piece.valid_move(end_pos)
-    rescue
-
-      self[end_pos] = piece
-      self[start] = NullPiece.instance
-      piece.position = end_pos
+    valid_moves = piece.valid_moves
+    unless valid_moves.include?(end_pos)
+      raise "Not valid move"
     end
+
+    self[end_pos] = piece
+    self[start] = NullPiece.instance
+    piece.position = end_pos
+
+    @grid.flatten.each{|piece| piece.board=self unless piece.is_a?(NullPiece)}
   end
 
   def move!(start, end_pos)
-      piece = self[start]
-      self[end_pos] = piece
-      self[start] = NullPiece.instance
-      piece.position = end_pos
+    piece = self[start]
+    self[end_pos] = piece
+    self[start] = NullPiece.instance
+    piece.position = end_pos
   end
   # def valid_move?(start, end_pos)
   #   start.nil?
@@ -140,5 +140,5 @@ end
 #
 # p arr1[2].object_id == arr2[2].object_id
 
-b = Board.new
-Display.new(b, true).render
+# b = Board.new
+# Display.new(b, true).render
