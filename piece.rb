@@ -85,7 +85,6 @@ class King < Piece
     super
     @symbol = :K
   end
-
 end
 
 class Knight < Piece

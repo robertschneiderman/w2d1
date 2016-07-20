@@ -24,9 +24,10 @@ class Game
 
   def play
     while true
-      @display.render
+      @display.render(current_player)
       begin
         next_move = current_player.play_turn
+        raise "not your piece" unless players_piece?(next_move)
         @board.move(*next_move)
       rescue
         puts $!
@@ -36,7 +37,7 @@ class Game
       switch_player!
     end
     Display.new(@board).render
-    puts "#{@current_player} wins!"
+    puts "#{current_player.name} wins!"
   end
 
   def switch_player!
@@ -50,6 +51,12 @@ class Game
 
   def other_player
     @player_order.last
+  end
+
+  def players_piece?(next_move)
+    selected_pos = next_move[0]
+    selected_piece=@board[selected_pos]
+    selected_piece.color == current_player.color
   end
 
 end

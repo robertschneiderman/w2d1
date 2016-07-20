@@ -1,5 +1,5 @@
 class HumanPlayer
-  attr_accessor :color
+  attr_accessor :name, :color
 
   # include
 
@@ -11,13 +11,13 @@ class HumanPlayer
   def play_turn
     old_pos = @display.get_input
     until old_pos
-      @display.render
+      @display.render(self)
       old_pos= @display.get_input
     end
 
     new_pos = @display.get_input
     until new_pos
-      @display.render
+      @display.render(self)
       new_pos= @display.get_input
     end
 

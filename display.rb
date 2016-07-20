@@ -37,10 +37,11 @@ class Display
     { background: bg, color: color }
   end
 
-  def render
+  def render(player = nil)
     system("clear")
-    puts "Fill the grid!"
-    puts "Arrow keys, WASD, or vim to move, space or enter to confirm."
+    # puts "Fill the grid!"
+    # puts "Arrow keys, WASD, or vim to move, space or enter to confirm."
+    puts "#{player.name}'s Turn" if player
     build_grid.each { |row| puts row.join }
     if @debug
       selected_piece = @board[@cursor_pos]

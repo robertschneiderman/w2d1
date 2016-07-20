@@ -84,7 +84,7 @@ class Board
   end
 
   def move(start, end_pos)
-    piece = self[start]
+    piece = self[start] if self[start].color
     valid_moves = piece.valid_moves
     unless valid_moves.include?(end_pos)
       raise "Not valid move"
